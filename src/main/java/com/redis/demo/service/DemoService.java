@@ -25,12 +25,12 @@ public class DemoService {
      * @Date 17:11 2019/8/5
      **/
     
-    @Cacheable(value = "usercache")
+    @Cacheable(value = "usercache",keyGenerator = "cacheKeyGenerator")
     public User findUser(Long id, String firstName, String lastName){
         System.out.println("无缓存——————>调用数据库");
         return new User(id,firstName,lastName);
     }
-    @Cacheable(value = "addresscache")
+    @Cacheable(value = "addresscache",keyGenerator = "cacheKeyGenerator")
     public Address findAddress(Long id, String province, String city){
         System.out.println("无缓存——————>调用数据库");
         return new Address(id,province,city);

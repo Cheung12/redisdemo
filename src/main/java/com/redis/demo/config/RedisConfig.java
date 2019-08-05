@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheManager;
@@ -16,6 +17,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
+
+import com.alibaba.fastjson.JSON;
 /**
  * @Name RedisConfig
  * @Description TODO
@@ -65,4 +68,25 @@ public class RedisConfig {
                 lettuceClientConfigurationBuilder.build());
         return factory;
     }
+    /**
+     * @Author zz
+     * @Description 自定義Redis的key生成規則
+     * @Date 20:08 2019/8/5
+     * @Param []
+     * @return org.springframework.cache.interceptor.KeyGenerator
+     **/
+    @Bean
+    public KeyGenerator cacheKeyGenerator() {
+        return (target, method, params) -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append(target.getClass().getName());
+            sb.append(method.getName());
+            for (Object obj : params) {
+                // 由于参数可能不同, hashCode肯定不一样, 缓存的key也需要不一样
+                sb.append(JSON.toJSONString(obj).hashCode());
+            }
+            return sb.toString();
+        };
+    }
+
 }
